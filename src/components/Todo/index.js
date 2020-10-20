@@ -1,8 +1,7 @@
 import React, {useState, useEffect} from "react";
-import TodoItem from "./TodoItem";
-import Loader from "../Loader";
 import Actions from "./Actions";
 import TodoModal from "./Modal";
+import TodoList from "./TodoList";
 
 export default function Todo() {
   let [todoList, setTodoList] = useState([])
@@ -14,7 +13,7 @@ export default function Todo() {
   useEffect(() => {
     setStateLoader(true)
     setTimeout(() => { // fake delay
-      fetch('https://jsonplaceholder.typicode.com/todos')
+      fetch('https://jsonplaceholder.typicode.com/todos?_limit=10')
         .then(response => response.json())
         .then(json => setTodoList(json));
     }, 0)
@@ -36,19 +35,38 @@ export default function Todo() {
     setModalState(false);
   }
   
+  let createTodo = (item) => {
+    setTodoList([item, ...todoList]);
+    closeModal();
+  }
+  
+  let updateTodo = (item) => {
+    let array = todoList;
+    array[array.find((el, index) => el.id === item.id ? index : null)] = item;
+    closeModal();
+  }
+  
   return (
     <div className="row">
       <div className="col-12 d-flex justify-content-end mb-2">
-        <Actions openModal={openModal} closeModal={closeModal} active={active} setType={setActionType} deleteItem={deleteItem} />
-        { modal ? <TodoModal isOpen={modal} isNew={actionType === "NEW"} form={active} closeModal={closeModal} /> : null }
+        <Actions openModal={openModal}
+                 closeModal={closeModal}
+                 active={active}
+                 setType={setActionType}
+                 deleteItem={deleteItem}/>
+        {modal ? <TodoModal isOpen={modal}
+                            isNew={actionType === "NEW"}
+                            form={active}
+                            closeModal={closeModal}
+                            updateTodo={updateTodo}
+                            createTodo={createTodo}/> : null}
       </div>
       <div className="col-12">
         <div className="list-group">
-          {
-            todoList && todoList.length ?
-              todoList.map(item => <TodoItem key={`item-${item.id}`} item={item} active={active} toggleItem={setActive}/>) :
-              loader ? <Loader/> : <p>no data</p>
-          }
+          <TodoList active={active}
+                    loader={loader}
+                    setActive={setActive}
+                    todoList={todoList}/>
         </div>
       </div>
     </div>

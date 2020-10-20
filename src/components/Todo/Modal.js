@@ -2,13 +2,14 @@ import React from "react";
 import PropTypes from "prop-types";
 import "../../assets/styles/Modal.style.scss"
 
-function TodoModal({isOpen, isNew, form, closeModal}) {
+function TodoModal({isOpen, isNew, form, closeModal, createTodo, updateTodo}) {
   let defaultForm = {
     title: "",
     userId: 1,
     completed: false
   }
   let [editForm, setEditForm] = React.useState(null);
+  
   React.useEffect(() => {
     setEditForm(isNew ? defaultForm : form);
   }, [])
@@ -16,13 +17,13 @@ function TodoModal({isOpen, isNew, form, closeModal}) {
   let onChangeTitle = (value) => {
     let form = editForm;
     form.title = value;
-    setEditForm(form);
+    setEditForm({...form});
   }
   
   let onChangeStatus = (value) => {
     let form = editForm;
     form.completed = value;
-    setEditForm(form);
+    setEditForm({...form});
   }
   return (
     <div>{isOpen ? <div className="modal-wrapper">
@@ -38,10 +39,14 @@ function TodoModal({isOpen, isNew, form, closeModal}) {
             {editForm ?
               <form className="form-group">
                 <label htmlFor="form-title">Title</label>
-                <input onChange={(event) => onChangeTitle(event.target.value)} type="text" value={editForm.title}
+                <input onChange={(event) => onChangeTitle(event.target.value)}
+                       type="text"
+                       value={editForm.title}
                        className="form-control mb-2"/>
                 <label htmlFor="form-status">Status</label>
-                <select onChange={(event) => onChangeStatus(event.target.value)} className="form-control"
+                <select onChange={(event) => onChangeStatus(event.target.value)}
+                        className="form-control"
+                        disabled={isNew}
                         value={editForm.completed}>
                   <option value={true} label={`Completed`}/>
                   <option value={false} label={`In Process`}/>
@@ -52,7 +57,7 @@ function TodoModal({isOpen, isNew, form, closeModal}) {
             <button onClick={() => closeModal()} type="button" className="btn btn-secondary"
                     data-dismiss="modal">Close
             </button>
-            <button type="button" className="btn btn-primary">{isNew ? 'Create Todo' : 'Update Todo'}</button>
+            <button onClick={() => isNew ? createTodo(editForm) : updateTodo(editForm)} type="button" className="btn btn-primary">{isNew ? 'Create Todo' : 'Update Todo'}</button>
           </div>
         </div>
       </div>
@@ -64,7 +69,9 @@ TodoModal.propTypes = {
   isOpen: PropTypes.bool,
   isNew: PropTypes.bool,
   form: PropTypes.object,
-  closeModal: PropTypes.func
+  closeModal: PropTypes.func,
+  createTodo: PropTypes.func,
+  updateTodo: PropTypes.func
 }
 
 export default TodoModal

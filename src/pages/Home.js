@@ -7,7 +7,7 @@ import Todo from "../components/Todo";
 export default function Home() {
   let {param} = useParams() // Вытаскиваем params c URL
   return (
-    <div className="row home">
+    <div className="row home mb-5">
       <div className="col-12">
         <SearchInput />
       </div>
